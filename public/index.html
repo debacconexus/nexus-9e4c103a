@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIRS Nexus — Governed Data System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#e8f4ff;--bg2:#f0f9ff;--border:rgba(2,136,209,.35);--text:#0d1f3c;--text2:#2563a8;--text3:#5a7f9c;--gold:#d4a017;--teal:#00a896;--cyan:#0288d1;--coral:#ff6b6b;--green:#2db85c;--radius:12px}
+body{font-family:'Inter',sans-serif;font-size:15px;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+.header{background:linear-gradient(180deg,#eef3fa,#ffffff);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:100}
+.logo{font-size:22px;font-weight:800;color:#0d1f3c;display:flex;align-items:center;gap:8px}
+.logo-star{color:var(--gold)}
+.igm-bar{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);display:flex;gap:12px;border-left:1px solid var(--border);padding-left:16px}
+.igm-governed{color:var(--teal);font-weight:700}
+.nav{width:220px;background:var(--bg2);border-right:1px solid var(--border);padding:20px 12px;position:fixed;top:60px;left:0;height:calc(100vh - 60px);overflow-y:auto}
+.nav-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;text-align:left;margin-bottom:2px}
+.nav-btn:hover{background:rgba(98,200,255,.08)}
+.nav-btn.active{background:linear-gradient(135deg,rgba(51,224,196,.15),rgba(98,200,255,.1));color:#0d1f3c;border:1px solid rgba(51,224,196,.3);font-weight:600}
+.layout{display:flex;padding-top:60px;min-height:100vh}
+.main{margin-left:220px;flex:1;padding:28px;box-sizing:border-box}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card-title{font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.section{display:none}
+.section.active{display:block;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.schema-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:24px}
+.schema-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;transition:all .2s}
+.schema-card:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.schema-field-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.schema-field-name{font-size:14px;font-weight:600;color:var(--text)}
+.consultation-section{background:linear-gradient(135deg,#f0f9ff,#e8f4ff);border:1px solid rgba(2,136,209,.2);border-radius:12px;padding:24px;margin-bottom:24px}
+.consultation-prompt{background:#ffffff;padding:20px;border-radius:8px;border-left:4px solid var(--cyan);margin-bottom:16px}
+.consultation-prompt-title{font-size:12px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.consultation-prompt-text{font-size:14px;color:var(--text);line-height:1.6}
+.consultation-response{background:#ffffff;padding:20px;border-radius:8px;border-left:4px solid var(--teal);margin-bottom:16px}
+.consultation-response-title{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.consultation-response-text{font-size:14px;color:var(--text);line-height:1.6;font-style:italic}
+.governance-note{background:rgba(51,224,196,.08);border:1px solid rgba(51,224,196,.25);border-radius:8px;padding:16px;margin-top:16px}
+.governance-note-title{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px}
+.governance-note-text{font-size:13px;color:var(--text2)}
+.story-card{background:#f7faff;border:1px solid rgba(2,136,209,.2);border-radius:12px;padding:24px;margin-bottom:16px;-webkit-user-select:none;user-select:none}
+.story-title{font-size:16px;font-weight:700;color:#0064CD;margin-bottom:8px}
+.story-text{font-size:14px;color:var(--text);line-height:1.7}
+.demo-watermark{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(90deg,#0064CD,#059669);color:#fff;text-align:center;padding:8px;font-size:11px;font-weight:700;z-index:9999;font-family:'IBM Plex Mono',monospace}
+</style>
+<script>window.NEXUS_META={"nexus_name":"Professional Learning and Development System for Special Education in Inclusive Classrooms","entity_label":"Educator Record","fields":["MODULE COMPLETION STATUS","POST-TRAINING CONFIDENCE RATING","CLASSROOM OBSERVATION SCORE","STUDENT IEP PROGRESS MEASURE","IMPLEMENTATION FIDELITY LEVEL","REGIONAL COMPLIANCE FRAMEWORK"],"pods":[{"pod_name":"Fidelity Triangle Dashboard","pod_type":"infographic","description":"Visual representation of the relationship between confidence gained, behavior change, and student outcomes across all educators, revealing fidelity gaps and implementation effectiveness patterns"},{"pod_name":"Regional Comparison Analytics","pod_type":"window","description":"Interactive comparison view showing implementation differences between Belize and California educators, including compliance framework variations and cultural adaptation factors"},{"pod_name":"Module Impact Assessment","pod_type":"room","description":"Comprehensive analysis space for evaluating which of the 6 PLD modules drive actual behavior change versus confidence building, with drill-down capabilities for coaching narratives and observation data"}],"governance_tier":"Standard","schema_description":"Each educator record comprehensively tracks professional learning journey through 12 critical dimensions, from module completion and confidence ratings to classroom implementation fidelity and student IEP progress, enabling analysis of the gap between training confidence and actual behavior change in inclusive classroom settings."};</script></head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="logo"><span class="logo-star">★</span> AIRS</div>
+  </div>
+  <div class="igm-bar">
+    <span class="igm-governed">IGM: GOVERNED</span>
+    <span>USPTO 19/571,156</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="nav">
+    <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:16px 8px 6px">AIRS NEXUS</div>
+    <button class="nav-btn active" onclick="showMode('home')">◯ Home</button>
+    <button class="nav-btn" onclick="showMode('consultation')">📋 Consultation</button>
+    <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:16px 8px 6px;margin-top:8px">REPORTS</div>
+    <button class="nav-btn" onclick="showMode('about')">★ About AIRS</button>
+  </div>
+
+  <div class="main">
+    <!-- HOME -->
+    <div id="section-home" class="section active">
+      <div class="card">
+        <h1 id="header-name" style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:8px">Nexus System</h1>
+        <p id="header-subtitle" style="font-size:14px;color:var(--text2)">Governed Data System</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">SCHEMA FIELDS (12)</div>
+        <div class="schema-grid" id="schema-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">GENERATED PODS</div>
+        <div id="pods-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- CONSULTATION -->
+    <div id="section-consultation" class="section">
+      <div class="consultation-section">
+        <h2 style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:20px">Consultation Blueprint</h2>
+        
+        <div class="consultation-prompt">
+          <div class="consultation-prompt-title">📋 Original Problem Statement</div>
+          <div class="consultation-prompt-text" id="consultation-prompt">Professional Learning and Development System for Special Education in Inclusive Classrooms across Belizean schools and California inner-city and charter schools. Each educator record tracks 12 fields: Module Completion Status tracking which of 6 PLD modules completed plus engagement level, Post-Training Confidence Rating on a 1-10 scale, Classroom Observation Score from external observer rubric rating, Student IEP Progress Measure tracking whether students with IEPs are progressing, Implementation Fidelity Level measuring how consistently educators use PLD strategies to separate confidence from actual behavior change, Regional Compliance Framework documenting IDEA for US or Belize-specific protocols, Educator Experience Level capturing years teaching plus special ed certification plus prior PD, Baseline Confidence Score Pre-Intervention for measuring change, Specific Practices Changed tracking which strategies stuck including differentiation and peer support and assistive tech and behavior management, PD Module Attendance tracking completion rate and engagement signals, Student Population Served documenting disability types and severity levels and baseline achievement, and Support Structure Quality measuring coaching availability and peer collaboration and resource access and school leadership buy-in. Stakeholders include teachers themselves, school administrators, the research team, special education directors in both regions, UCLA Digital Technology and Solutions, Belize National Teachers Union, and the US Embassy in Belize for funding accountability. Compliance frameworks include IDEA, research ethics protocols for US versus Belize contexts, BNTU professional learning standards, and school accountability measures. The 6 PLD modules are Special Education Coping Mechanisms for Educators, Classroom Management in Inclusive Settings, AI and Gamification in Special Education, Instructional Technology and Integration, Computer Studies for Accessibility, and Financial Literacy for Educators. Governed notes must capture classroom observation narratives, coaching session summaries, educator self-reflections, and module feedback. The system must track the Fidelity Triangle distinguishing Confidence Gained from Behavior Change from Student Outcome Shift. The system must reveal the fidelity gap between confidence and behavior change, regional differences between Belize and California educators, which modules actually change behavior versus just build confidence, school-level factors explaining implementation success or failure, whether student progress links to teacher behavior change or just confidence, and scaling readiness indicators before expanding from UCLA pilot to full Belize deployment.</div>
+        </div>
+
+        <div class="consultation-response">
+          <div class="consultation-response-title">💭 AIRS Consultant Analysis</div>
+          <div class="consultation-response-text" id="consultation-response">No consultation was performed for this Nexus.</div>
+        </div>
+
+        <div class="governance-note">
+          <div class="governance-note-title">🔒 Governance Note</div>
+          <div class="governance-note-text">This consultation is part of the immutable audit trail. All data decisions trace back to this blueprint. USPTO Patent Pending 19/571,156.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT AIRS -->
+    <div id="section-about" class="section">
+      <div style="padding:32px;max-width:800px;margin:0 auto">
+        <h1 style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:24px">What Makes AIRS Different</h1>
+        
+        <div class="story-card">
+          <div class="story-title">The Problem</div>
+          <div class="story-text">Most data systems claim to be governed. But governance is theater — policies without teeth. When data drifts or decisions fail, the system has no built-in way to catch it, log it, or enforce consequences.</div>
+        </div>
+
+        <div class="story-card">
+          <div class="story-title">Our Answer</div>
+          <div class="story-text">Governance embedded in architecture. Every inference logged. Every violation detected. Every boundary cryptographically enforced. Constitutional governance with founder-only kill switches. This is what real accountability looks like.</div>
+        </div>
+
+        <div class="story-card">
+          <div class="story-title">The Three Tiers</div>
+          <div class="story-text">
+            <strong>NSI (Tier 1):</strong> Audits what your schema cannot see — invisible gaps.<br>
+            <strong>GDI (Tier 2):</strong> Governed inference with receipts. Every decision is logged and traceable.<br>
+            <strong>PGI (Tier 3):</strong> Predictions with confidence bounds and approval gates.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="demo-watermark">
+  AIRS DEMO — DeBacco Nexus LLC — USPTO Patent Pending 19/571,156 — <a href="https://airs-studio-production.up.railway.app" target="_blank" style="color:#FAC775;text-decoration:none">Build your own Nexus →</a>
+</div>
+
+<script>
+const metadata = window.nexusMetadata || {};
+const nexusData = metadata.data || {};
+
+// 12 fields
+const FIELDS = nexusData.fields || Array.from({length: 12}, (_, i) => \`Field \${i + 1}\`);
+
+// Initialize
+document.getElementById('header-name').textContent = nexusData.nexus_name || 'Nexus System';
+document.getElementById('header-subtitle').textContent = nexusData.schema_description || 'Governed Data System';
+
+// Consultation
+document.getElementById('consultation-prompt').textContent = nexusData.prompt || 'Problem statement not available.';
+document.getElementById('consultation-response').textContent = nexusData.consultant_response || 'Consultant analysis not available.';
+
+// Schema grid (12 fields)
+const schemaGrid = document.getElementById('schema-grid');
+FIELDS.forEach((field, i) => {
+  const card = document.createElement('div');
+  card.className = 'schema-card';
+  card.innerHTML = \`<div class="schema-field-label">Field \${i + 1}</div><div class="schema-field-name">\${field}</div>\`;
+  schemaGrid.appendChild(card);
+});
+
+// Pods
+const podsGrid = document.getElementById('pods-grid');
+(nexusData.pods || []).forEach(pod => {
+  const podCard = document.createElement('div');
+  podCard.className = 'card';
+  podCard.style.marginBottom = '0';
+  podCard.innerHTML = \`
+    <div style="text-transform:uppercase;font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:1px;margin-bottom:8px">\${pod.pod_type}</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">\${pod.pod_name}</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6">\${pod.description}</div>
+  \`;
+  podsGrid.appendChild(podCard);
+});
+
+// Navigation
+function showMode(mode) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById(\`section-\${mode}\`);
+  if (section) {
+    section.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+window.addEventListener('load', () => window.scrollTo(0, 0));
+</script>
+
+</body>
+</html>
